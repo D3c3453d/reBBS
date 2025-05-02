@@ -22,9 +22,6 @@ docker-makefile:
 docker-compose:
 	cd docker && docker compose --env-file=../${env_file} up -d --build
 
-install-lint:
-	poetry run pre-commit install
-
 lint:
 	poetry run pre-commit run --all-files
 
