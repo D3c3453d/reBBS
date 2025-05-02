@@ -1,9 +1,5 @@
 SHELL := /bin/bash
 
-DJANGO_SUPERUSER_NAME ?= admin
-DJANGO_SUPERUSER_EMAIL ?= ''
-DJANGO_SUPERUSER_PASSWORD ?= admin
-
 
 ifeq ($(ENV),)
 	include .env.dev
@@ -14,6 +10,11 @@ ifeq ($(ENV),dev)
 	include .env.dev
 	env_file=.env.dev
 endif
+
+
+DJANGO_SUPERUSER_NAME ?= admin
+DJANGO_SUPERUSER_EMAIL ?= ''
+DJANGO_SUPERUSER_PASSWORD ?= admin
 
 
 docker-makefile:
