@@ -16,6 +16,9 @@ ifeq ($(ENV),dev)
 endif
 
 
+docker-makefile:
+	docker cp ./Makefile rebbs-django-1:/opt/Makefile
+
 docker-compose:
 	cd docker && docker compose --env-file=../${env_file} up -d --build
 
@@ -31,8 +34,5 @@ makemigrations:
 migrate:
 	poetry run python manage.py migrate
 
-createsuperuser: makemigrations migrate
+superuser: makemigrations migrate
 	poetry run python manage.py createsuperuser --username=${DJANGO_SUPERUSER_NAME} --email=${DJANGO_SUPERUSER_EMAIL} --noinput
-
-init: makemigrations migrate create_superuser
-	echo "All done."
