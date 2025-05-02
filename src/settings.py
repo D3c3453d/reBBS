@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Project
-    "src.db",
+    "src.infrastructure.db",
 ]
 
 MIDDLEWARE = [

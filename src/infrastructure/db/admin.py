@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from src.db.forms import MemberChangeForm, MemberCreationForm
-from src.db.models import Chat, Member, MemberChat, Message
+from src.infrastructure.db.forms import MemberChangeForm, MemberCreationForm
+from src.infrastructure.db.models import Chat, Member, MemberChat, Message
 
 
 class MemberAdmin(UserAdmin):
