@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from src.db.forms import MemberChangeForm, MemberCreationForm
-from src.db.models import Chat, Member, MemberChat
+from src.db.models import Chat, Member, MemberChat, Message
 
 
 class MemberAdmin(UserAdmin):
@@ -44,6 +44,22 @@ class ChatAdmin(admin.ModelAdmin):
     get_members_count.short_description = "Participants"
 
 
+# Message Admin
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ("truncated_content", "member", "chat", "created_at")
+    list_filter = ("chat", "member", "created_at")
+    search_fields = ["content", "chat__name", "member__username"]
+    raw_id_fields = ("member", "chat")
+    date_hierarchy = "created_at"
+    readonly_fields = ("created_at", "updated_at")
+
+    def truncated_content(self, obj: Message):
+        return obj.content[:50] + "..." if len(obj.content) > 50 else obj.content
+
+    truncated_content.short_description = "Content"
+
+
 admin.site.register(Member, MemberAdmin)
 admin.site.register(Chat, ChatAdmin)
+admin.site.register(Message, MessageAdmin)
 admin.site.register(MemberChat)

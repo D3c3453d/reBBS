@@ -36,3 +36,12 @@ class MemberChat(GenericModel):
 
     class Meta:
         unique_together = ("member", "chat")
+
+
+class Message(GenericModel):
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    content = models.TextField()
+
+    def __str__(self):
+        return f"Message by {self.member.username} in {self.chat.name}"
