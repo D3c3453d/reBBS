@@ -7,13 +7,10 @@ readme = "README.md"
 packages = [{from = "src", include = "*"}]
 
 [tool.poetry.dependencies]
-python = "^3.10, <3.13"
+python = "^3.12, <3.13"
 asyncpg = "^0.29.0"
 psycopg2-binary = "^2.9.9"
 Django = "^5.2"
-django-ninja = "^1.4.0"
-django-ninja-extra = "^0.22.9"
-django-ninja-jwt = "^5.3.7"
 pydantic = "^2.11.3"
 pydantic-settings = "^2.8.1"
 pillow = "^11.2.1"
