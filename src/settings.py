@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 from pydantic_settings import BaseSettings
@@ -52,7 +53,9 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "daphne",
     "django.contrib.staticfiles",
+    "channels",
     # Project
     "src.infrastructure.db",
 ]
@@ -68,12 +71,12 @@ MIDDLEWARE = [
 ]
 
 AUTH_USER_MODEL = "db.Member"
-ROOT_URLCONF = "src.urls"
+ROOT_URLCONF = "src.infrastructure.web.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "src/infrastructure/web/templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -85,7 +88,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "src.wsgi.application"
+ASGI_APPLICATION = "src.infrastructure.web.asgi.application"
+
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 
 # Database
@@ -143,3 +148,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+LOGIN_REDIRECT_URL = "chat-page"
+LOGOUT_REDIRECT_URL = "login-user"

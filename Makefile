@@ -17,8 +17,9 @@ DJANGO_SUPERUSER_EMAIL ?= ''
 DJANGO_SUPERUSER_PASSWORD ?= admin
 
 
-docker-makefile:
+docker-sync:
 	docker cp ./Makefile rebbs-django-1:/opt/Makefile
+	docker cp ./.env.dev rebbs-django-1:/opt/.env.dev
 
 docker-compose:
 	cd docker && docker compose --env-file=../${env_file} up -d --build
