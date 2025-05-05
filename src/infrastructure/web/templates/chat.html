@@ -13,10 +13,10 @@
       <h1 class="display-4">Hello, {{request.user}}!</h1>
       <br />
       {% if request.user.is_authenticated  %}
-        Logout the chat Page
         <form action="{% url 'logout-user' %}" method="post" style="display:inline">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger">Logout</button>
+          <label for="btn-logout">Logout the chat page</label>
+          <button type="submit" id="btn-logout" class="btn btn-danger">Logout</button>
         </form>
         <div
         class="col-sm-5"
