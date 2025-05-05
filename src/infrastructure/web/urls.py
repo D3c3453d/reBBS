@@ -15,14 +15,45 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import path
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
+from django.urls import include, path
 
-from src.infrastructure.web.views import chat_view
+from src.infrastructure.web.views import chat_view, chats_view, home_view, signup_view
+
+auth_urlpatterns = [
+    path("login/", LoginView.as_view(template_name="auth/login.html"), name="login"),
+    path("logout/", LogoutView.as_view(), name="logout"),
+    path("signup/", signup_view, name="signup"),
+    # Password reset
+    path("password-reset/", PasswordResetView.as_view(template_name="auth/password_reset.html"), name="password_reset"),
+    path(
+        "password-reset/done/",
+        PasswordResetDoneView.as_view(template_name="auth/password_reset_done.html"),
+        name="password_reset_done",
+    ),
+    path(
+        "reset/<uidb64>/<token>/",
+        PasswordResetConfirmView.as_view(template_name="auth/password_reset_confirm.html"),
+        name="password_reset_confirm",
+    ),
+    path(
+        "reset/done/",
+        PasswordResetCompleteView.as_view(template_name="auth/password_reset_complete.html"),
+        name="password_reset_complete",
+    ),
+]
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", chat_view, name="chat-page"),
-    path("auth/login/", LoginView.as_view(template_name="login.html"), name="login-user"),
-    path("auth/logout/", LogoutView.as_view(), name="logout-user"),
+    path("", home_view, name="home"),
+    path("chats/", chats_view, name="chats"),
+    path("chat/<int:chat_id>/", chat_view, name="chat"),
+    path("auth/", include(auth_urlpatterns)),
 ]
