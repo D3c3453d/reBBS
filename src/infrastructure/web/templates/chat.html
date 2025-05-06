@@ -20,8 +20,38 @@
 
     .chat-messages {
         flex: 1;
-        overflow-y: auto;
         padding: 1rem 1rem 80px 1rem;
+    }
+
+    .message-bubble {
+        max-width: 75%;
+        width: fit-content;
+        padding: 0.5rem 0.75rem;
+        margin: 0.5rem 0;
+        border-radius: 1rem;
+        word-break: break-word;
+        /* transition: transform 0.2s ease; */
+    }
+
+    /* .message-bubble:hover {
+        transform: translateY(-1px);
+    } */
+
+    .message-user {
+        background: #007bff;
+        color: white;
+        margin-left: auto;
+    }
+
+    .message-other {
+        background: #e9ecef;
+        margin-right: auto;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.6;
+        margin-top: 0.25rem;
     }
 
     .chat-input {
@@ -42,66 +72,26 @@
         align-items: flex-end;
     }
 
-    /* Deepseek-inspired message bubbles */
-    .message-bubble {
-        max-width: 80%;
-        padding: 12px 16px;
-        margin: 8px 0;
-        border-radius: 18px;
-        word-break: break-word;
-        font-size: 0.95rem;
-        line-height: 1.4;
-        position: relative;
-        transition: transform 0.2s ease;
-    }
-
-    .message-user {
-        background: #1a73e8;
-        color: white;
-        margin-left: auto;
-        border-radius: 18px 18px 4px 18px;
-    }
-
-    .message-other {
-        background: #f1f3f4;
-        color: #202124;
-        margin-right: auto;
-        border-radius: 18px 18px 18px 4px;
-    }
-
-    .message-time {
-        font-size: 0.75rem;
-        opacity: 0.8;
-        margin-top: 4px;
-        display: block;
-        text-align: right;
-    }
-
-    /* Scrollbar styling */
-    .chat-messages::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .chat-messages::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    .chat-messages::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-    }
-
-    /* Updated textarea styling */
+    /* Textarea styling */
     #chat-message-input {
-        min-height: 44px;  /* 2-line default height */
+        min-height: 44px;
         line-height: 1.4;
         padding: 10px 16px;
     }
-
-    /* Navbar adjustments */
-    .navbar-brand {
-        margin-right: 2rem;
+    #chat-message-input::-webkit-scrollbar {
+        display: block;
+        width: 5px;
     }
+    #chat-message-input::-webkit-scrollbar-track {
+        background: transparent;
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+    #chat-message-input::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 8px;
+    }
+
     .chat-title {
         position: absolute;
         left: 50%;
@@ -115,7 +105,7 @@
     <div class="container position-relative">
         <a class="navbar-brand" href="{% url 'chats' %}">reBBS</a>
 
-        <!-- Centered chat name -->
+        <!-- Chat name -->
         <div class="chat-title">
             <span class="h6 mb-0">{{ chat.name }}</span>
         </div>
@@ -125,7 +115,7 @@
             {% if request.user.is_authenticated %}
             <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
-                <!-- Proper logout button -->
+                <!-- Logout button -->
                 <button type="submit" class="btn btn-outline-danger btn-sm">
                     Logout
                 </button>
@@ -153,7 +143,7 @@
                      rows="2"
                      placeholder="Type your message..."
                      style="resize: none; background: #fff; border-radius: 12px;"></textarea>
-            <button id="chat-message-submit" class="btn btn-primary mb-2" style="border-radius: 12px;">
+            <button id="chat-message-submit" class="btn btn-primary mb-2 shadow-lg" style="border-radius: 12px;">
                 Send
             </button>
         </div>
@@ -161,7 +151,7 @@
 </div>
 
 <script>
-        const chatId = "{{ chat.id }}";
+    const chatId = "{{ chat.id }}";
     const userId = "{{ request.user.id }}";
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const endpoint = `${protocol}://${window.location.host}/ws/chat/${chatId}/`;
@@ -197,17 +187,6 @@
       };
     }
 
-    function scrollToBottom() {
-        const log = document.getElementById('chat-log');
-        // Double-check scroll position
-        requestAnimationFrame(() => {
-            log.scrollTo({
-                top: log.scrollHeight,
-                behavior: 'smooth'
-            });
-        });
-    }
-
     function addMessageToChat(data) {
         const wrapper = document.createElement('div');
         const isUser = data.member_id == userId;
@@ -219,14 +198,16 @@
 
         const time = document.createElement('div');
         time.className = 'message-time';
-        time.textContent = new Date(data.created_at).toLocaleTimeString();
+        time.textContent = new Date(data.created_at).toLocaleTimeString("ru-RU");
         wrapper.appendChild(time);
 
         log.appendChild(wrapper);
-        scrollToBottom();
 
-        // Force reflow for consistent scrolling
         void log.offsetHeight;
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
     }
 
     // Improved textarea auto-resize
@@ -236,14 +217,16 @@
         input.style.height = Math.min(input.scrollHeight, maxHeight) + 'px';
     }
 
+    window.addEventListener('load', adjustTextarea);
     input.addEventListener('input', adjustTextarea);
-    window.addEventListener('load', adjustTextarea);  // Initial adjustment
 
     button.addEventListener('click', () => {
       const text = input.value.trim();
       if (!text) return;
       chatSocket.send(JSON.stringify({ type: 'message', content: text }));
       input.value = '';
+      void input.scrollHeight;
+      adjustTextarea();
     });
 
     input.addEventListener('keyup', e => {
