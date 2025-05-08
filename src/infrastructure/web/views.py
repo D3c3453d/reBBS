@@ -6,8 +6,8 @@ from infrastructure.db.forms import MemberCreationForm
 from src.infrastructure.db.models import Chat
 
 
-def home_view(request, *args, **kwargs):
-    return render(request, "home.html")
+def welcome_view(request, *args, **kwargs):
+    return render(request, "welcome.html")
 
 
 def signup_view(request):
