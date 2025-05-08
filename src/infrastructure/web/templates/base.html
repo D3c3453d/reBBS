@@ -62,7 +62,19 @@
   <nav class="navbar navbar-expand-md navbar-light bg-white nav-main fixed-top border-bottom">
     <div class="container position-relative">
       <a class="navbar-brand" href="{% url 'chats' %}">reBBS</a>
+
       {% block nav_content %}{% endblock %}
+
+      <!-- Right: Status + Logout -->
+      <div class="d-flex align-items-center gap-3 flex-shrink-0">
+        <span id="connection-status" class="badge bg-success">Online</span>
+        {% if request.user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="post" class="m-0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+        </form>
+        {% endif %}
+      </div>
     </div>
   </nav>
   {% endblock %}
