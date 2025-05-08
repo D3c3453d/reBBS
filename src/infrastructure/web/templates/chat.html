@@ -1,241 +1,190 @@
+<!--chat.html-->
 {% extends "base.html" %}
 {% block title %}{{ chat.name }} | reBBS{% endblock %}
 
 {% block extra_css %}
 <style>
-    .chat-container {
-        padding-top: 70px;
-        padding-bottom: 20px;
-        height: 100vh;
-    }
+  .chat-container {
+    padding-bottom: 20px;
+    height: 100vh;
+  }
 
-    .chat-window {
-        max-width: 800px;
-        margin: 0 auto;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        background: transparent;
-    }
+  .chat-window {
+    max-width: 800px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-    .chat-messages {
-        flex: 1;
-        padding: 1rem 1rem 80px 1rem;
-    }
+  .chat-messages {
+    flex: 1;
+    padding: 1rem 1rem 80px 1rem;
+  }
 
-    .message-bubble {
-        max-width: 75%;
-        width: fit-content;
-        padding: 0.5rem 0.75rem;
-        margin: 0.5rem 0;
-        border-radius: 1rem;
-        word-break: break-word;
-        /* transition: transform 0.2s ease; */
-    }
+  .message-bubble {
+    max-width: 75%;
+    width: fit-content;
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 1rem;
+    word-break: break-word;
+  }
 
-    /* .message-bubble:hover {
-        transform: translateY(-1px);
-    } */
+  .message-user {
+    background: #007bff;
+    color: white;
+    margin-left: auto;
+  }
 
-    .message-user {
-        background: #007bff;
-        color: white;
-        margin-left: auto;
-    }
+  .message-other {
+    background: #e9ecef;
+    margin-right: auto;
+  }
 
-    .message-other {
-        background: #e9ecef;
-        margin-right: auto;
-    }
+  .message-time {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-top: 0.25rem;
+  }
 
-    .message-time {
-        font-size: 0.75rem;
-        opacity: 0.6;
-        margin-top: 0.25rem;
-    }
+  .chat-input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    z-index: 1000;
+  }
 
-    .chat-input {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+  .input-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+  }
 
-        padding: 1rem;
-        z-index: 1000;
-    }
+  #chat-message-input {
+    min-height: 44px;
+    line-height: 1.4;
+    padding: 10px 16px;
+    resize: none;
+    background: #fff;
+    border-radius: 12px;
+  }
 
-    .input-wrapper {
-        max-width: 1000px;
-        margin: 0 auto;
-        display: flex;
-        gap: 1rem;
-        align-items: flex-end;
-    }
+  #chat-message-input::-webkit-scrollbar {
+    width: 5px;
+  }
+  #chat-message-input::-webkit-scrollbar-track {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  #chat-message-input::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 8px;
+  }
 
-    /* Textarea styling */
-    #chat-message-input {
-        min-height: 44px;
-        line-height: 1.4;
-        padding: 10px 16px;
-    }
-    #chat-message-input::-webkit-scrollbar {
-        display: block;
-        width: 5px;
-    }
-    #chat-message-input::-webkit-scrollbar-track {
-        background: transparent;
-        margin-top: 8px;
-        margin-bottom: 8px;
-    }
-    #chat-message-input::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 8px;
-    }
-
-    .chat-title {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    }
 </style>
 {% endblock %}
 
-{% block navbar %}
-<nav class="navbar navbar-expand-md navbar-light bg-white fixed-top border-bottom">
-    <div class="container position-relative">
-        <a class="navbar-brand" href="{% url 'chats' %}">reBBS</a>
+{% block nav_content %}
+<!-- Center: Chat Title -->
+<span class="h6 mb-0 text-center flex-grow-1">{{ chat.name }}</span>
 
-        <!-- Chat name -->
-        <div class="chat-title">
-            <span class="h6 mb-0">{{ chat.name }}</span>
-        </div>
-
-        <div class="d-flex align-items-center gap-3">
-            <span id="connection-status" class="badge bg-success">Online</span>
-            {% if request.user.is_authenticated %}
-            <form action="{% url 'logout' %}" method="post">
-                {% csrf_token %}
-                <!-- Logout button -->
-                <button type="submit" class="btn btn-outline-danger btn-sm">
-                    Logout
-                </button>
-            </form>
-            {% endif %}
-        </div>
-    </div>
-</nav>
+<!-- Right: Status + Logout -->
+<div class="d-flex align-items-center gap-3 flex-shrink-0">
+    <span id="connection-status" class="badge bg-success">Online</span>
+    {% if request.user.is_authenticated %}
+    <form action="{% url 'logout' %}" method="post" class="m-0">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+    </form>
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block content %}
 <div class="chat-window chat-container">
-    <div class="chat-messages" id="chat-log">
-        <!-- Messages will be inserted here -->
+  <div class="chat-messages" id="chat-log"></div>
+  <div id="typing-indicator" class="text-muted small px-3" style="display:none;">Someone is typing...</div>
+  <div class="chat-input">
+    <div class="input-wrapper">
+      <textarea id="chat-message-input" class="form-control border-1 shadow-lg" rows="2"
+        placeholder="Type your message..."></textarea>
+      <button id="chat-message-submit" class="btn btn-primary mb-2 shadow-lg" style="border-radius: 12px;">
+        Send
+      </button>
     </div>
-
-    <div id="typing-indicator" class="text-muted small px-3" style="display:none;">
-        Someone is typing...
-    </div>
-
-    <div class="chat-input">
-        <div class="input-wrapper">
-            <textarea id="chat-message-input"
-                     class="form-control border-1 shadow-lg"
-                     rows="2"
-                     placeholder="Type your message..."
-                     style="resize: none; background: #fff; border-radius: 12px;"></textarea>
-            <button id="chat-message-submit" class="btn btn-primary mb-2 shadow-lg" style="border-radius: 12px;">
-                Send
-            </button>
-        </div>
-    </div>
+  </div>
 </div>
 
 <script>
-    const chatId = "{{ chat.id }}";
-    const userId = "{{ request.user.id }}";
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const endpoint = `${protocol}://${window.location.host}/ws/chat/${chatId}/`;
-    let chatSocket;
+  const chatId = "{{ chat.id }}";
+  const userId = "{{ request.user.id }}";
+  const endpoint = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/chat/${chatId}/`;
+  let chatSocket;
 
-    const log = document.getElementById('chat-log');
-    const input = document.getElementById('chat-message-input');
-    const button = document.getElementById('chat-message-submit');
-    const statusBadge = document.getElementById('connection-status');
+  const log = document.getElementById('chat-log');
+  const input = document.getElementById('chat-message-input');
+  const button = document.getElementById('chat-message-submit');
+  const statusBadge = document.getElementById('connection-status');
 
-    function connect() {
-      chatSocket = new WebSocket(endpoint);
+  function connect() {
+    chatSocket = new WebSocket(endpoint);
 
-      chatSocket.onopen = () => {
-        statusBadge.className = 'badge bg-success me-2';
-        statusBadge.textContent = 'Online';
-      };
+    chatSocket.onopen = () => {
+      statusBadge.className = 'badge bg-success me-2';
+      statusBadge.textContent = 'Online';
+    };
 
-      chatSocket.onclose = () => {
-        statusBadge.className = 'badge bg-danger me-2';
-        statusBadge.textContent = 'Offline';
-        setTimeout(connect, 5000);
-      };
+    chatSocket.onclose = () => {
+      statusBadge.className = 'badge bg-danger me-2';
+      statusBadge.textContent = 'Offline';
+      setTimeout(connect, 5000);
+    };
 
-      chatSocket.onerror = e => {
-        statusBadge.className = 'badge bg-warning me-2';
-        statusBadge.textContent = 'Error';
-      };
+    chatSocket.onerror = () => {
+      statusBadge.className = 'badge bg-warning me-2';
+      statusBadge.textContent = 'Error';
+    };
 
-      chatSocket.onmessage = e => {
-        const data = JSON.parse(e.data);
-        addMessageToChat(data);
-      };
-    }
+    chatSocket.onmessage = e => addMessageToChat(JSON.parse(e.data));
+  }
 
-    function addMessageToChat(data) {
-        const wrapper = document.createElement('div');
-        const isUser = data.member_id == userId;
-        wrapper.className = `message-bubble ${isUser ? 'message-user' : 'message-other'}`;
+  function addMessageToChat(data) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `message-bubble ${data.member_id == userId ? 'message-user' : 'message-other'}`;
+    wrapper.innerHTML = `<div>${data.content}</div><div class="message-time">${new Date(data.created_at).toLocaleTimeString("ru-RU")}</div>`;
+    log.appendChild(wrapper);
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
 
-        const content = document.createElement('div');
-        content.textContent = data.content;
-        wrapper.appendChild(content);
+  function adjustTextarea() {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+  }
 
-        const time = document.createElement('div');
-        time.className = 'message-time';
-        time.textContent = new Date(data.created_at).toLocaleTimeString("ru-RU");
-        wrapper.appendChild(time);
+  window.addEventListener('load', adjustTextarea);
+  input.addEventListener('input', adjustTextarea);
 
-        log.appendChild(wrapper);
-
-        void log.offsetHeight;
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: 'smooth'
-        });
-    }
-
-    // Improved textarea auto-resize
-    function adjustTextarea() {
-        input.style.height = 'auto';
-        const maxHeight = 150;  // 6-line max
-        input.style.height = Math.min(input.scrollHeight, maxHeight) + 'px';
-    }
-
-    window.addEventListener('load', adjustTextarea);
-    input.addEventListener('input', adjustTextarea);
-
-    button.addEventListener('click', () => {
-      const text = input.value.trim();
-      if (!text) return;
+  button.addEventListener('click', () => {
+    const text = input.value.trim();
+    if (text) {
       chatSocket.send(JSON.stringify({ type: 'message', content: text }));
       input.value = '';
-      void input.scrollHeight;
       adjustTextarea();
-    });
+    }
+  });
 
-    input.addEventListener('keyup', e => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        button.click();
-      }
-    });
+  input.addEventListener('keyup', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      button.click();
+    }
+  });
 
-    connect();
+  connect();
 </script>
 {% endblock %}
