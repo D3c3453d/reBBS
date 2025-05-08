@@ -6,8 +6,8 @@
 
 {% block content %}
 <div class="fullscreen d-flex justify-content-center align-items-center">
-  <div class="auth-card w-100">
-    <h2 class="h4 text-center mb-4">Create Account</h2>
+  <div class="auth-card">
+    <h4 class="text-center mb-4">Create Account</h4>
     <form method="post" novalidate>
       {% csrf_token %}
       {% for field in form %}

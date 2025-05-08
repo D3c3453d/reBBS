@@ -12,12 +12,13 @@
       --hover-shadow: 0 0.75rem 1.5rem rgba(0,0,0,0.15);
       --card-bg: #fff;
       --body-bg: #f8f9fa;
+      --padding-top: 70px;
     }
 
     body {
       background-color: var(--body-bg);
       min-height: 100vh;
-      padding-top: 70px;
+      padding-top: var(--padding-top);
     }
 
     .auth-card,
@@ -34,6 +35,12 @@
       box-shadow: var(--hover-shadow);
     }
 
+    .auth-card {
+      width: 100%;
+      padding: 2rem;
+      max-width: 400px;
+    }
+
     .nav-main {
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
@@ -45,7 +52,7 @@
     }
 
     .fullscreen {
-      height: calc(100vh - 70px);
+      height: calc(100vh - var(--padding-top));
     }
   </style>
   {% block extra_css %}{% endblock %}
