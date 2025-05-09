@@ -2,6 +2,18 @@
 {% extends "base.html" %}
 {% block title %}Your Chats | reBBS{% endblock %}
 
+{% block nav_content %}
+<!-- Right: Logout -->
+<div class="d-flex align-items-center gap-3 flex-shrink-0">
+    {% if request.user.is_authenticated %}
+    <form action="{% url 'logout' %}" method="post" class="m-0">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
+
 {% block content %}
 <h1 class="mb-4">Your Chats</h1>
 {% if chats %}
