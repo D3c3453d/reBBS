@@ -1,3 +1,4 @@
+# src/interface/repositories/chat.py
 from abc import ABC, abstractmethod
 from typing import List
 

@@ -1,3 +1,4 @@
+# src/entities/chat.py
 from dataclasses import dataclass
 
 

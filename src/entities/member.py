@@ -1,3 +1,4 @@
+# src/entities/member.py
 from dataclasses import dataclass
 
 
