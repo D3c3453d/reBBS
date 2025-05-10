@@ -163,7 +163,7 @@
 
     wrapper.innerHTML = `
       ${name}
-      <div>${data.content}</div>
+      <div style="white-space: pre-wrap;">${data.content}</div>
       <div class="message-time">${new Date(data.created_at).toLocaleTimeString("ru-RU")}</div>
     `;
     log.appendChild(wrapper);
