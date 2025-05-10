@@ -1,0 +1,20 @@
+<!--welcome.html-->
+{% extends "base.html" %}
+{% block title %}Welcome | reBBS{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div class="fullscreen d-flex flex-column justify-content-center align-items-center text-center">
+  <h1 class="display-4 mb-3">Welcome to reBBS</h1>
+  <p class="lead mb-4">A simple and elegant real-time chat system.</p>
+  <div>
+    {% if user.is_authenticated %}
+      <a href="{% url 'chats' %}" class="btn btn-primary btn-lg">Enter Chats</a>
+    {% else %}
+      <a href="{% url 'login' %}" class="btn btn-success btn-lg me-2">Login</a>
+      <a href="{% url 'signup' %}" class="btn btn-outline-primary btn-lg">Register</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

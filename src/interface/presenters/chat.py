@@ -1,9 +1,11 @@
+# src/interface/presenters/chat.py
 from entities.message import MessageEntity
 from pydantic import BaseModel
 
 
 class MessagePresenter(BaseModel):
     member_id: int
+    username: str
     chat_id: int
     content: str
     created_at: str
@@ -12,6 +14,7 @@ class MessagePresenter(BaseModel):
     def from_entity(cls, entity: MessageEntity) -> "MessagePresenter":
         return cls(
             member_id=entity.member_id,
+            username=entity.username,
             chat_id=entity.chat_id,
             content=entity.content,
             created_at=entity.created_at.isoformat(),

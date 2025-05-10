@@ -143,6 +143,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+# Directory where collectstatic gathers files
+STATIC_ROOT = BASE_DIR / "static"
+# Additional locations for static files in development
+STATICFILES_DIRS = [
+    BASE_DIR / "src/infrastructure/web/static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -152,4 +158,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "chats"
-LOGOUT_REDIRECT_URL = "login"
+LOGOUT_REDIRECT_URL = "welcome"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

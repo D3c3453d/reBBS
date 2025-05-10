@@ -28,10 +28,14 @@ lint:
 	poetry run pre-commit run --all-files
 
 makemigrations:
-	poetry run python manage.py makemigrations
+	docker exec -it rebbs-django-1 sh -c "poetry run python manage.py makemigrations"
 
 migrate:
-	poetry run python manage.py migrate
+	docker exec -it rebbs-django-1 sh -c "poetry run python manage.py migrate"
 
 superuser: makemigrations migrate
-	poetry run python manage.py createsuperuser --username=${DJANGO_SUPERUSER_NAME} --email=${DJANGO_SUPERUSER_EMAIL} --noinput
+	docker exec -it rebbs-django-1 sh -c "poetry run python manage.py createsuperuser --username=${DJANGO_SUPERUSER_NAME} --email=${DJANGO_SUPERUSER_EMAIL} --noinput"
+
+static:
+	docker exec -it rebbs-django-1 sh -c "poetry run python manage.py collectstatic --noinput"
+	docker restart rebbs-django-1

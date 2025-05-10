@@ -1,3 +1,4 @@
+# src/interface/controllers/chat.py
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from infrastructure.db.repositories.chat import DjangoChatRepository
 from interface.presenters.chat import MessagePresenter

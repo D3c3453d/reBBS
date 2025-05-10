@@ -1,3 +1,4 @@
+# src/usecases/chat.py
 from src.entities.message import MessageEntity
 from src.interface.repositories.chat import ChatRepository
 
