@@ -7,6 +7,7 @@ from datetime import datetime
 class MessageEntity:
     id: int
     member_id: int
+    username: str
     chat_id: int
     content: str
     created_at: datetime

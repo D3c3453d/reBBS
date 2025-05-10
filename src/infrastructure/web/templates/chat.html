@@ -156,7 +156,16 @@
   function addMessageToChat(data) {
     const wrapper = document.createElement('div');
     wrapper.className = `message-bubble ${data.member_id == userId ? 'message-user' : 'message-other'}`;
-    wrapper.innerHTML = `<div>${data.content}</div><div class="message-time">${new Date(data.created_at).toLocaleTimeString("ru-RU")}</div>`;
+
+    const name = (data.member_id != userId && data.username)
+    ? `<div class="fw-semibold mb-1">${data.username}</div>`
+    : '';
+
+    wrapper.innerHTML = `
+      ${name}
+      <div>${data.content}</div>
+      <div class="message-time">${new Date(data.created_at).toLocaleTimeString("ru-RU")}</div>
+    `;
     log.appendChild(wrapper);
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   }
