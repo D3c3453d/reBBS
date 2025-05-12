@@ -1,5 +1,4 @@
 # src/infrastructure/db/repositories/message.py
-from asgiref.sync import sync_to_async
 from django.contrib.auth import get_user_model
 
 from src.entities.message import MessageEntity
@@ -26,16 +25,11 @@ class MessageRepository(MessageRepositoryProtocol):
             username=member.username,
         )
 
-    @sync_to_async
-    def _sync_list_recent(self, chat_id: int, offset: int, limit: int):
-        # Returns a normal Python list of model instances
-        return list(
+    async def list_recent(self, chat_id: int, offset: int, limit: int) -> list[MessageEntity]:
+        queryset = (
             Message.objects.select_related("member").filter(chat_id=chat_id).order_by("-created_at")[offset:limit]
         )
-
-    async def list_recent(self, chat_id: int, offset: int, limit: int) -> list[MessageEntity]:
-        # Fetch the rows in a thread, then map to entities
-        messages = await self._sync_list_recent(chat_id, offset, limit)
+        rows = [row async for row in queryset]
         # Reverse so oldest → newest
         return [
             MessageEntity(
@@ -46,5 +40,5 @@ class MessageRepository(MessageRepositoryProtocol):
                 created_at=message.created_at,
                 username=message.member.username,
             )
-            for message in reversed(messages)
+            for message in reversed(rows)
         ]
