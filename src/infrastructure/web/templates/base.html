@@ -82,8 +82,11 @@
 
         <!-- Right: Connection Status (optional), Profile, Logout -->
         <div class="d-flex align-items-center gap-3">
-          {% block nav_status %}{% endblock %}
-          <a class="nav-link" href="">{{ request.user.username }}</a>
+          {% block nav_right %}{% endblock %}
+          <div class="d-flex flex-column align-items-center text-center">
+            <a id="profile" class="nav-link" href="">{{ request.user.username }}</a>
+            {% block nav_status %}{% endblock %}
+          </div>
           {% if request.user.is_authenticated %}
           <form action="{% url 'logout' %}" method="post" class="m-0">
             {% csrf_token %}

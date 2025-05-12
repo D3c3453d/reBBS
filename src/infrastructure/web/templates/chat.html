@@ -93,8 +93,20 @@
   <span class="h6 mb-0 text-center">{{ chat.name }}</span>
 {% endblock %}
 
+{% block nav_right %}
+<form method="post" action="{% url 'toggle_subscription' chat.id %}">
+  {% csrf_token %}
+  {% if is_subscribed %}
+    <button type="submit" class="btn btn-outline-danger btn-sm">Unsubscribe</button>
+  {% else %}
+    <button type="submit" class="btn btn-outline-success btn-sm">Subscribe</button>
+  {% endif %}
+</form>
+{% endblock %}
+
+
 {% block nav_status %}
-  <span id="connection-status" class="badge bg-success">Online</span>
+  <label id="connection-status" for="chat-name" class="badge bg-success">Online</label>
 {% endblock %}
 
 {% block content %}

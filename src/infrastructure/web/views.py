@@ -1,9 +1,23 @@
+from asgiref.sync import async_to_sync
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from infrastructure.db.forms import MemberCreationForm
+from interface.controllers.chat import ChatController
+from usecases.chat import ChatUsecases, CreateChat, IsSubscribed, SubscribeToChat, UnsubscribeFromChat
 
 from src.infrastructure.db.models import Chat
+from src.infrastructure.db.repositories.chat import ChatRepository
+
+chat_repo = ChatRepository()
+chat_controller = ChatController(
+    ChatUsecases(
+        create_chat=CreateChat(chat_repo),
+        subscribe=SubscribeToChat(chat_repo),
+        unsubscribe=UnsubscribeFromChat(chat_repo),
+        is_subscribed=IsSubscribed(chat_repo),
+    )
+)
 
 
 def welcome_view(request, *args, **kwargs):
@@ -29,7 +43,8 @@ def signup_view(request):
 @login_required
 def chat_view(request, chat_id, *args, **kwargs):
     chat = get_object_or_404(Chat, id=chat_id)
-    return render(request, "chat.html", {"chat": chat})
+    is_subscribed = async_to_sync(chat_repo.is_subscribed)(request.user.id, chat_id)
+    return render(request, "chat.html", {"chat": chat, "is_subscribed": is_subscribed})
 
 
 @login_required
@@ -42,3 +57,16 @@ def all_chats_view(request, *args, **kwargs):
 def subscribed_chats_view(request, *args, **kwargs):
     chats = list(Chat.objects.filter(members=request.user.id))
     return render(request, "chats.html", {"chats": chats, "title": "Subscribed Chats"})
+
+
+@login_required
+def create_chat_view(request):
+    if request.method == "POST":
+        chat_controller.handle_create_chat(owner_id=request.user.id, payload=request.POST)
+    return redirect(request.META.get("HTTP_REFERER"))
+
+
+@login_required
+def toggle_chat_subscription_view(request, chat_id):
+    async_to_sync(chat_controller.toggle_subscription)(request.user.id, chat_id)
+    return redirect(request.META.get("HTTP_REFERER"))

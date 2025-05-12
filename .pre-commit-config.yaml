@@ -29,6 +29,7 @@ repos:
     rev: v0.1.4
     hooks:
       - id: ruff
+        exclude: "src/infrastructure/db/migrations/"
         args: [ --fix ]
       - id: ruff-format
 

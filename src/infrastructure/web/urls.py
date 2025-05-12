@@ -25,7 +25,15 @@ from django.contrib.auth.views import (
 )
 from django.urls import include, path
 
-from src.infrastructure.web.views import all_chats_view, chat_view, signup_view, subscribed_chats_view, welcome_view
+from src.infrastructure.web.views import (
+    all_chats_view,
+    chat_view,
+    create_chat_view,
+    signup_view,
+    subscribed_chats_view,
+    toggle_chat_subscription_view,
+    welcome_view,
+)
 
 auth_urlpatterns = [
     path("login/", LoginView.as_view(template_name="auth/login.html"), name="login"),
@@ -55,6 +63,8 @@ urlpatterns = [
     path("", welcome_view, name="welcome"),
     path("all-chats/", all_chats_view, name="all-chats"),
     path("subscribed-chats/", subscribed_chats_view, name="subscribed-chats"),
+    path("chats/create/", create_chat_view, name="create_chat"),
     path("chat/<int:chat_id>/", chat_view, name="chat"),
+    path("chat/<int:chat_id>/toggle-subscription/", toggle_chat_subscription_view, name="toggle_subscription"),
     path("auth/", include(auth_urlpatterns)),
 ]

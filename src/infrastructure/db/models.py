@@ -24,7 +24,9 @@ class Member(GenericModel, AbstractUser):
 
 class Chat(GenericModel):
     name = models.CharField(max_length=255)
+    description = models.TextField()
     is_group = models.BooleanField(default=False)
+    owner = models.ForeignKey(Member, on_delete=models.CASCADE)
     members = models.ManyToManyField(Member, through="db.MemberChat", related_name="chats")
 
     def __str__(self):
