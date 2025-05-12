@@ -90,19 +90,11 @@
 {% endblock %}
 
 {% block nav_content %}
-<!-- Center: Chat Title -->
-<span class="h6 mb-0 text-center flex-grow-1">{{ chat.name }}</span>
+  <span class="h6 mb-0 text-center">{{ chat.name }}</span>
+{% endblock %}
 
-<!-- Right: Status + Logout -->
-<div class="d-flex align-items-center gap-3 flex-shrink-0">
-    <span id="connection-status" class="badge bg-success">Online</span>
-    {% if request.user.is_authenticated %}
-    <form action="{% url 'logout' %}" method="post" class="m-0">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
-    </form>
-    {% endif %}
-</div>
+{% block nav_status %}
+  <span id="connection-status" class="badge bg-success">Online</span>
 {% endblock %}
 
 {% block content %}

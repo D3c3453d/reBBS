@@ -157,6 +157,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "chats"
+LOGIN_REDIRECT_URL = "subscribed-chats"
 LOGOUT_REDIRECT_URL = "welcome"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

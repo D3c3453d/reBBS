@@ -59,12 +59,41 @@
 </head>
 <body>
   {% block navbar %}
-  <nav class="navbar navbar-expand-md navbar-light bg-white nav-main fixed-top border-bottom">
-    <div class="container position-relative">
-      <a class="navbar-brand" href="{% url 'chats' %}">reBBS</a>
-      {% block nav_content %}{% endblock %}
-    </div>
-  </nav>
+    <nav class="navbar navbar-expand-md navbar-light bg-white nav-main fixed-top border-bottom">
+      <div class="container d-flex align-items-center justify-content-between w-100">
+
+        <!-- Left: Brand + Links -->
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="{% url 'welcome' %}">reBBS</a>
+          <ul class="navbar-nav ms-3">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'all-chats' %}">All Chats</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'subscribed-chats' %}">Subscribed</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Center: Custom block (like Chat Title) -->
+        <div class="flex-grow-1 d-flex justify-content-center">
+          {% block nav_content %}{% endblock %}
+        </div>
+
+        <!-- Right: Connection Status (optional), Profile, Logout -->
+        <div class="d-flex align-items-center gap-3">
+          {% block nav_status %}{% endblock %}
+          <a class="nav-link" href="">{{ request.user.username }}</a>
+          {% if request.user.is_authenticated %}
+          <form action="{% url 'logout' %}" method="post" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+          </form>
+          {% endif %}
+        </div>
+
+      </div>
+    </nav>
   {% endblock %}
 
   <main class="container">

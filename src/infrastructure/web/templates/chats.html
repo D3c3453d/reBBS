@@ -3,19 +3,10 @@
 {% block title %}Your Chats | reBBS{% endblock %}
 
 {% block nav_content %}
-<!-- Right: Logout -->
-<div class="d-flex align-items-center gap-3 flex-shrink-0">
-    {% if request.user.is_authenticated %}
-    <form action="{% url 'logout' %}" method="post" class="m-0">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
-    </form>
-    {% endif %}
-</div>
 {% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Your Chats</h1>
+<h1 class="mb-4">{{ title }}</h1>
 {% if chats %}
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {% for chat in chats %}

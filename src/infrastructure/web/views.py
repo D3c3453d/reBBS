@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from infrastructure.db.forms import MemberCreationForm
 
 from src.infrastructure.db.models import Chat
@@ -33,6 +33,12 @@ def chat_view(request, chat_id, *args, **kwargs):
 
 
 @login_required
-def chats_view(request, *args, **kwargs):
-    chats = get_list_or_404(Chat)
-    return render(request, "chats.html", {"chats": chats})
+def all_chats_view(request, *args, **kwargs):
+    chats = list(Chat.objects.all())
+    return render(request, "chats.html", {"chats": chats, "title": "All Chats"})
+
+
+@login_required
+def subscribed_chats_view(request, *args, **kwargs):
+    chats = list(Chat.objects.filter(members=request.user.id))
+    return render(request, "chats.html", {"chats": chats, "title": "Subscribed Chats"})
