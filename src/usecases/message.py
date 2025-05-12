@@ -10,7 +10,7 @@ class SendMessage:
         self.repo = repo
 
     async def execute(self, member_id: int, chat_id: int, content: str) -> MessageEntity:
-        return await self.repo.save(member_id, chat_id, content)
+        return await self.repo.create(member_id, chat_id, content)
 
 
 class GetRecentMessages:

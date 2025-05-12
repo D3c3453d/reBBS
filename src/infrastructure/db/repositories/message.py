@@ -9,7 +9,7 @@ Member = get_user_model()
 
 
 class MessageRepository(MessageRepositoryProtocol):
-    async def save(self, member_id: int, chat_id: int, content: str) -> MessageEntity:
+    async def create(self, member_id: int, chat_id: int, content: str) -> MessageEntity:
         message = await Message.objects.acreate(
             member_id=member_id,
             chat_id=chat_id,
