@@ -6,7 +6,7 @@ from infrastructure.db.forms import MemberCreationForm
 from interface.controllers.chat import ChatController
 from usecases.chat import ChatUsecases, CreateChat, IsSubscribed, SubscribeToChat, UnsubscribeFromChat
 
-from src.infrastructure.db.models import Chat
+from src.infrastructure.db.models import Chat, Member
 from src.infrastructure.db.repositories.chat import ChatRepository
 
 chat_repo = ChatRepository()
@@ -70,3 +70,32 @@ def create_chat_view(request):
 def toggle_chat_subscription_view(request, chat_id):
     async_to_sync(chat_controller.toggle_subscription)(request.user.id, chat_id)
     return redirect(request.META.get("HTTP_REFERER"))
+
+
+@login_required
+def chat_info_view(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id)
+    members = chat.members.all()  # ← список участников чата
+    return render(request, "chat_info.html", {"chat": chat, "members": members})
+
+
+@login_required
+def member_profile_view(request, member_id):
+    member = get_object_or_404(Member, id=member_id)
+    return render(request, "member_profile.html", {"member": member})
+
+
+@login_required
+def edit_profile_view(request):
+    user = request.user
+
+    if request.method == "POST":
+        user.username = request.POST.get("username")
+        user.email = request.POST.get("email")
+        user.bio = request.POST.get("bio")
+        user.save()
+
+        messages.success(request, "Your profile was updated successfully.")
+        return redirect("edit_profile")
+
+    return render(request, "edit_profile.html", {"user": user})

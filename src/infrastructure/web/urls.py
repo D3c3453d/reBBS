@@ -27,8 +27,11 @@ from django.urls import include, path
 
 from src.infrastructure.web.views import (
     all_chats_view,
+    chat_info_view,
     chat_view,
     create_chat_view,
+    edit_profile_view,
+    member_profile_view,
     signup_view,
     subscribed_chats_view,
     toggle_chat_subscription_view,
@@ -66,5 +69,8 @@ urlpatterns = [
     path("chats/create/", create_chat_view, name="create_chat"),
     path("chat/<int:chat_id>/", chat_view, name="chat"),
     path("chat/<int:chat_id>/toggle-subscription/", toggle_chat_subscription_view, name="toggle_subscription"),
+    path("chat/<int:chat_id>/info/", chat_info_view, name="chat_info"),
     path("auth/", include(auth_urlpatterns)),
+    path("member/<int:member_id>/", member_profile_view, name="member_profile"),
+    path("profile/edit/", edit_profile_view, name="edit_profile"),
 ]

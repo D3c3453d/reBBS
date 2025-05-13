@@ -14,6 +14,7 @@ class GenericModel(models.Model):
 class Member(GenericModel, AbstractUser):
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
     online_status = models.BooleanField(default=False)
+    bio = models.TextField(blank=True, null=True)
 
     date_joined = None
 
