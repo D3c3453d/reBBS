@@ -37,6 +37,7 @@
         target: ${TARGET}
       volumes:
         - ../src/:/opt/src/
+        - ../tests/:/opt/tests/
       depends_on:
         - postgres
       ports:

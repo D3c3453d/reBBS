@@ -39,3 +39,6 @@ superuser: makemigrations migrate
 static:
 	docker exec -it rebbs-django-1 sh -c "poetry run python manage.py collectstatic --noinput"
 	docker restart rebbs-django-1
+
+test:
+	docker exec -it rebbs-django-1 sh -c "poetry run pytest --ds=src.settings tests"
