@@ -97,16 +97,16 @@
 <form method="post" action="{% url 'toggle_subscription' chat.id %}">
   {% csrf_token %}
   {% if is_subscribed %}
-    <button type="submit" class="btn btn-outline-danger btn-sm">Unsubscribe</button>
+    <button type="submit" class="btn btn-outline-danger btn-sm btn-right-navbar">Unsubscribe</button>
   {% else %}
-    <button type="submit" class="btn btn-outline-success btn-sm">Subscribe</button>
+    <button type="submit" class="btn btn-outline-success btn-sm btn-right-navbar">Subscribe</button>
   {% endif %}
 </form>
 {% endblock %}
 
 
 {% block nav_status %}
-  <label id="connection-status" for="chat-name" class="badge bg-success">Online</label>
+  <label id="connection-status" for="chat-name" class="badge bg-success" style="display: none;">Online</label>
 {% endblock %}
 
 {% block content %}
@@ -129,6 +129,7 @@
   const userId = "{{ request.user.id }}";
   const endpoint = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/chat/${chatId}/`;
   let chatSocket;
+  let connected = false;
 
   const log = document.getElementById('chat-log');
   const input = document.getElementById('chat-message-input');
@@ -141,15 +142,18 @@
     chatSocket.onopen = () => {
       statusBadge.className = 'badge bg-success me-2';
       statusBadge.textContent = 'Online';
+      connected = true;
     };
 
     chatSocket.onclose = () => {
       statusBadge.className = 'badge bg-danger me-2';
       statusBadge.textContent = 'Offline';
+      connected = false;
       setTimeout(connect, 5000);
     };
 
     chatSocket.onerror = () => {
+      connected = false;
       statusBadge.className = 'badge bg-warning me-2';
       statusBadge.textContent = 'Error';
     };
@@ -184,7 +188,7 @@
 
   button.addEventListener('click', () => {
     const text = input.value.trim();
-    if (text) {
+    if (text && connected) {
       chatSocket.send(JSON.stringify({ type: 'message', content: text }));
       input.value = '';
       adjustTextarea();
