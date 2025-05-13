@@ -96,6 +96,5 @@ def edit_profile_view(request):
         user.save()
 
         messages.success(request, "Your profile was updated successfully.")
-        return redirect("edit_profile")
 
-    return render(request, "edit_profile.html", {"user": user})
+    return redirect(request.META.get("HTTP_REFERER"))
