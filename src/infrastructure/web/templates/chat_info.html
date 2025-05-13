@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Chat Info | reBBS{% endblock %}
+
+{% block nav_content %}
+  <span class="h6 mb-0 text-center">{{ chat.name }}</span>
+{% endblock %}
+
+{% block nav_right %}
+  <form method="post" action="{% url 'toggle_subscription' chat.id %}">
+    {% csrf_token %}
+    {% if is_subscribed %}
+      <button type="submit" class="btn btn-outline-danger btn-sm">Unsubscribe</button>
+    {% else %}
+      <button type="submit" class="btn btn-outline-success btn-sm">Subscribe</button>
+    {% endif %}
+  </form>
+{% endblock %}
+
+{% block nav_status %}
+  <label id="connection-status" for="chat-name" class="badge bg-success">Online</label>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Chat Information</h2>
+
+  <div class="card mb-4" style="max-width: 800px;">
+    <div class="card-body">
+      <h4>{{ chat.name }}</h4>
+      <p><strong>Description:</strong> {{ chat.description }}</p>
+      <p><strong>Owner:</strong> {{ chat.owner.username }}</p>
+    </div>
+  </div>
+
+  <h4>Members:</h4>
+  <ul>
+    {% for member in chat.members.all %}
+      <li>
+        <a href="{% url 'member_profile' member.id %}">{{ member.username }}</a>
+      </li>
+    {% empty %}
+      <p>No members</p>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'all-chats' %}" class="btn btn-outline-primary mt-4">Back to Chats</a>
+</div>
+{% endblock %}

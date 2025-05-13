@@ -14,6 +14,7 @@ class GenericModel(models.Model):
 class Member(GenericModel, AbstractUser):
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
     online_status = models.BooleanField(default=False)
+    bio = models.TextField(blank=True, null=True)
 
     date_joined = None
 
@@ -24,7 +25,9 @@ class Member(GenericModel, AbstractUser):
 
 class Chat(GenericModel):
     name = models.CharField(max_length=255)
+    description = models.TextField()
     is_group = models.BooleanField(default=False)
+    owner = models.ForeignKey(Member, on_delete=models.CASCADE)
     members = models.ManyToManyField(Member, through="db.MemberChat", related_name="chats")
 
     def __str__(self):
