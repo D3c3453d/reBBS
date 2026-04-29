@@ -1,0 +1,207 @@
+<!--chat.html-->
+{% extends "base.html" %}
+{% block title %}{{ chat.name }} | reBBS{% endblock %}
+
+{% block extra_css %}
+<style>
+  .chat-container {
+    padding-bottom: 20px;
+    height: 100vh;
+  }
+
+  .chat-window {
+    max-width: 800px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 1rem 1rem 80px 1rem;
+  }
+
+  .message-bubble {
+    max-width: 75%;
+    width: fit-content;
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 1rem;
+    word-break: break-word;
+  }
+
+  .message-user {
+    background: #007bff;
+    color: white;
+    margin-left: auto;
+  }
+
+  .message-other {
+    background: #e9ecef;
+    margin-right: auto;
+  }
+
+  .message-time {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-top: 0.25rem;
+  }
+
+  .chat-input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    z-index: 1000;
+  }
+
+  .input-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+
+  #chat-message-input {
+    min-height: 44px;
+    line-height: 1.4;
+    padding: 10px 16px;
+    resize: none;
+    background: #fff;
+    border-radius: 12px;
+  }
+
+  #chat-message-input::-webkit-scrollbar {
+    width: 5px;
+  }
+  #chat-message-input::-webkit-scrollbar-track {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  #chat-message-input::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 8px;
+  }
+
+</style>
+{% endblock %}
+
+{% block nav_content %}
+  <span class="h6 mb-0 text-center">{{ chat.name }}</span>
+{% endblock %}
+
+{% block nav_right %}
+<form method="post" action="{% url 'toggle_subscription' chat.id %}">
+  {% csrf_token %}
+  {% if is_subscribed %}
+    <button type="submit" class="btn btn-outline-danger btn-sm btn-right-navbar">Unsubscribe</button>
+  {% else %}
+    <button type="submit" class="btn btn-outline-success btn-sm btn-right-navbar">Subscribe</button>
+  {% endif %}
+</form>
+{% endblock %}
+
+
+{% block nav_status %}
+  <label id="connection-status" for="chat-name" class="badge bg-success" style="display: none;">Online</label>
+{% endblock %}
+
+{% block content %}
+<div class="chat-window chat-container">
+  <div class="chat-messages" id="chat-log"></div>
+  <div id="typing-indicator" class="text-muted small px-3" style="display:none;">Someone is typing...</div>
+  <div class="chat-input">
+    <div class="input-wrapper">
+      <textarea id="chat-message-input" class="form-control border-1 shadow-lg" rows="2"
+        placeholder="Type your message..."></textarea>
+      <button id="chat-message-submit" class="btn btn-primary mb-2 shadow-lg" style="border-radius: 12px;">
+        Send
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const chatId = "{{ chat.id }}";
+  const userId = "{{ request.user.id }}";
+  const endpoint = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/chat/${chatId}/`;
+  let chatSocket;
+  let connected = false;
+
+  const log = document.getElementById('chat-log');
+  const input = document.getElementById('chat-message-input');
+  const button = document.getElementById('chat-message-submit');
+  const statusBadge = document.getElementById('connection-status');
+
+  function connect() {
+    chatSocket = new WebSocket(endpoint);
+
+    chatSocket.onopen = () => {
+      statusBadge.className = 'badge bg-success me-2';
+      statusBadge.textContent = 'Online';
+      connected = true;
+    };
+
+    chatSocket.onclose = () => {
+      statusBadge.className = 'badge bg-danger me-2';
+      statusBadge.textContent = 'Offline';
+      connected = false;
+      setTimeout(connect, 5000);
+    };
+
+    chatSocket.onerror = () => {
+      connected = false;
+      statusBadge.className = 'badge bg-warning me-2';
+      statusBadge.textContent = 'Error';
+    };
+
+    chatSocket.onmessage = e => addMessageToChat(JSON.parse(e.data));
+  }
+
+  function addMessageToChat(data) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `message-bubble ${data.member_id == userId ? 'message-user' : 'message-other'}`;
+
+    const name = (data.member_id != userId && data.username)
+    ? `<div class="fw-semibold mb-1">${data.username}</div>`
+    : '';
+
+    wrapper.innerHTML = `
+      ${name}
+      <div style="white-space: pre-wrap;">${data.content}</div>
+      <div class="message-time">${new Date(data.created_at).toLocaleTimeString("ru-RU")}</div>
+    `;
+    log.appendChild(wrapper);
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  function adjustTextarea() {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+  }
+
+  window.addEventListener('load', adjustTextarea);
+  input.addEventListener('input', adjustTextarea);
+
+  button.addEventListener('click', () => {
+    const text = input.value.trim();
+    if (text && connected) {
+      chatSocket.send(JSON.stringify({ type: 'message', content: text }));
+      input.value = '';
+      adjustTextarea();
+    }
+  });
+
+  input.addEventListener('keyup', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      button.click();
+    }
+  });
+
+  connect();
+</script>
+{% endblock %}

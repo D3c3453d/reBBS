@@ -1,0 +1,44 @@
+  name: rebbs
+
+  volumes:
+    postgres_data:
+
+  networks:
+    default:
+      name: rebbs
+      external: true
+
+  x-app: &app
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "3"
+        max-size: "10m"
+    env_file:
+      - ../.env.dev
+    restart: always
+
+  services:
+    postgres:
+      <<: *app
+      image: postgres:14.0
+      hostname: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data/
+      ports:
+        - 5432:5432
+
+    django:
+      <<: *app
+      hostname: django
+      build:
+        context: ./..
+        dockerfile: ./docker/Dockerfile
+        target: ${TARGET}
+      volumes:
+        - ../src/:/opt/src/
+        - ../tests/:/opt/tests/
+      depends_on:
+        - postgres
+      ports:
+        - 8001:8000
